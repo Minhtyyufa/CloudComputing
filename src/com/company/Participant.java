@@ -2,7 +2,7 @@ package com.company;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Participant extends Runnable{
+public class Participant implements Runnable {
     private AtomicLong balance;
     private String id;
     private Message message;
@@ -17,13 +17,24 @@ public class Participant extends Runnable{
 
     // need a two way channel to communicate
     public void run(){
-        for(String command = message.getCommand(this.id); !command.split(" ")[1].equals("COMMIT") && !command.split(" ")[1].equals("ABORT"); command = message.getCommand(this.id))
+        for(String command = message.getCommand(this.id); !command.split(" ")[1].equals("DONE"); command = message.getCommand(this.id))
         {
-
+            if(command.split(" ")[1].equals("ABORT")){
+                //revert changes
+                return;
+            }
+            System.out.println(command);
         }
+
+        //For Demonstration Purposes
+        System.out.println("Process " + this.id + " has finished");
+
+        message.putResponse(this.id + " YES");
+
+        if(message.getCommand(this.id).split(" ")[1].equals("COMMIT"))
+            message.putResponse(this.id + " ACK");
+        else
+            message.putResponse(this.id + " ABORT");
     }
-
-
-
 
 }
