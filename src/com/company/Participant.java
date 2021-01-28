@@ -1,9 +1,14 @@
 package com.company;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Participant implements Runnable {
     private AtomicLong balance;
+    private AtomicLong newBalance;
+    private ReadWriteLock accountLock;
+    private Boolean firstCommand = true;
     private String id;
     private Message message;
 
@@ -11,9 +16,21 @@ public class Participant implements Runnable {
         this.balance = new AtomicLong(balance);
         this.id = id;
         this.message = message;
+        this.accountLock = new ReentrantReadWriteLock();
     }
 
-
+    private void handleCommand(String command){
+        if(firstCommand){
+            newBalance = balance;
+            accountLock.writeLock().lock();
+            firstCommand = false;
+        }
+        if(command.split(" ")[1].equals("sub")){
+            newBalance.addAndGet(-Long.parseLong(command.split(" ")[2]));
+        } else {
+            newBalance.addAndGet(Long.parseLong(command.split(" ")[2]));
+        }
+    }
 
     // need a two way channel to communicate
     public void run(){
@@ -21,22 +38,33 @@ public class Participant implements Runnable {
         {
             if(command.split(" ")[1].equals("ABORT")){
                 //revert changes
+                accountLock.writeLock().unlock();
                 message.putResponse(this.id + " ACKABORT");
                 return;
+            } else {
+                handleCommand(command);
             }
+
             System.out.println(command);
         }
+
+        firstCommand = true;
 
         //For Demonstration Purposes
         System.out.println("Process " + this.id + " has finished");
 
-        // If this comes back false abort changes
-        if(!message.putResponse(this.id + " YES")){
-            message.putResponse(this.id + " ACKABORT");
+        //Check if commands lead to a valid balance at the end (ie non-negative)
+        if(newBalance.get() < 0){
+            message.putResponse(this.id + " NO");
+        } else {
+            message.putResponse(this.id + " YES");
         }
 
-        if(message.getCommand(this.id).split(" ")[1].equals("COMMIT"))
+        if(message.getCommand(this.id).split(" ")[1].equals("COMMIT")) {
+            balance = newBalance;
+            accountLock.writeLock().unlock();
             message.putResponse(this.id + " ACK");
+        }
         else {
             message.putResponse(this.id + " ACKABORT");
         }
