@@ -21,6 +21,7 @@ public class Participant implements Runnable {
         {
             if(command.split(" ")[1].equals("ABORT")){
                 //revert changes
+                message.putResponse(this.id + " ACKABORT");
                 return;
             }
             System.out.println(command);
@@ -29,12 +30,16 @@ public class Participant implements Runnable {
         //For Demonstration Purposes
         System.out.println("Process " + this.id + " has finished");
 
-        message.putResponse(this.id + " YES");
+        // If this comes back false abort changes
+        if(!message.putResponse(this.id + " YES")){
+            message.putResponse(this.id + " ACKABORT");
+        }
 
         if(message.getCommand(this.id).split(" ")[1].equals("COMMIT"))
             message.putResponse(this.id + " ACK");
-        else
-            message.putResponse(this.id + " ABORT");
+        else {
+            message.putResponse(this.id + " ACKABORT");
+        }
     }
 
 }

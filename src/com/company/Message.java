@@ -13,19 +13,30 @@ public class Message {
     // Indicates that there is no response for the controller
     private boolean responseEmpty = true;
 
+    // Indicates the transaction is aborted and participants should revert changes
+    private boolean isAborted = false;
+
+
     public synchronized String getCommand(String id){
         // Returns command to participant when it corresponds to their user
         while(commandEmpty || !command.split(" ")[0].equals(id)){
             try {
                 wait();
+                if(isAborted)
+                    break;
             }
             catch (InterruptedException e) {
 
             }
         }
+
         commandEmpty = true;
         notifyAll();
-        return command;
+        if(isAborted) {
+            return id + " ABORT";
+        }
+        else
+            return command;
     }
 
     public synchronized void putCommand(String command){
@@ -55,16 +66,32 @@ public class Message {
         return response;
     }
 
-    public synchronized void putResponse(String response){
-        while(!responseEmpty){
+    public synchronized boolean putResponse(String response){
+        while(!responseEmpty && (!isAborted || response.split(" ")[1].equals("ACKABORT"))){
+
             try {
                 wait();
             } catch (InterruptedException e) {}
         }
 
-        responseEmpty = false;
 
+        responseEmpty = false;
         this.response = response;
         notifyAll();
+        if(isAborted){
+            return false;
+        }
+        return true;
+    }
+
+    // Tells all participants to abort the transaction
+    public synchronized void sendAbort(){
+        isAborted = true;
+        notifyAll();
+    }
+
+    // Used by the controller once all of the participants have aborted their transactions
+    public synchronized void allAborted(){
+        isAborted = false;
     }
 }
