@@ -1,13 +1,42 @@
 package com.company;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 public class Controller implements Runnable {
     private Message message;
 
     public Controller(Message message){
         this.message = message;
+    }
+
+    // Gets the ids from commands
+    private String[] getIDs(List<String> commands){
+        HashSet<String> ids = new HashSet<>();
+        for(String command : commands){
+           ids.add(command.split(" ")[0]);
+        }
+        return (String[]) ids.toArray();
+    }
+
+    // Reads the commands from a file
+    private List<String> readCommands(){
+        try {
+            BufferedReader fileReader = new BufferedReader(new FileReader("./commands.txt"));
+            List<String> commands = new ArrayList<>();
+            for(String line = fileReader.readLine(); line != null; line = fileReader.readLine()){
+                commands.add(line);
+            }
+            return commands;
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void abortTransaction(String[] ids){
@@ -51,20 +80,13 @@ public class Controller implements Runnable {
         return true;
     }
     public void run(){
-        // All of the participants that the controller will talk to
-        String[] ids = {
-                "a",
-                "b"
-        };
-
         // All of the commands the participants will do
-        String[] commands = {
-                "a add 10",
-                "b sub 5",
-                "b sub 5",
-                "a DONE",
-                "b DONE",
-        };
+        List<String> commands = readCommands();
+
+        // All of the participants that the controller will talk to
+        String[] ids = getIDs(commands);
+
+
 
         // Send each of the commands to the participants
         for (String command : commands) {
