@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 
 public class Controller implements Runnable {
-    private Message message;
-
+    private final Message message;
+    private final static String COMMAND_PATH = "./easy_abort_commands.txt";
     public Controller(Message message){
         this.message = message;
     }
@@ -21,13 +21,13 @@ public class Controller implements Runnable {
         for(String command : commands){
            ids.add(command.split(" ")[0]);
         }
-        return (String[]) ids.toArray();
+        return ids.toArray(new String[0]);
     }
 
     // Reads the commands from a file
     private List<String> readCommands(){
         try {
-            BufferedReader fileReader = new BufferedReader(new FileReader("./commands.txt"));
+            BufferedReader fileReader = new BufferedReader(new FileReader(COMMAND_PATH));
             List<String> commands = new ArrayList<>();
             for(String line = fileReader.readLine(); line != null; line = fileReader.readLine()){
                 commands.add(line);
@@ -80,13 +80,12 @@ public class Controller implements Runnable {
         return true;
     }
     public void run(){
+        long startTime = System.nanoTime();
         // All of the commands the participants will do
         List<String> commands = readCommands();
 
         // All of the participants that the controller will talk to
         String[] ids = getIDs(commands);
-
-
 
         // Send each of the commands to the participants
         for (String command : commands) {
@@ -97,6 +96,8 @@ public class Controller implements Runnable {
         if(!receiveFromEachParticipant(ids, "YES")){
             // If one voted no, abort the transaction entirely
             abortTransaction(ids);
+            long endTime = System.nanoTime();
+            System.out.println("Time to complete: " + (endTime - startTime)/1000000 + " milliseconds");
             return;
         }
 
@@ -107,5 +108,8 @@ public class Controller implements Runnable {
 
         // Wait for ACKs from each of the participants
         receiveFromEachParticipant(ids, "ACK");
+
+        long endTime = System.nanoTime();
+        System.out.println("Time to complete: " + (endTime - startTime)/1000000 + " milliseconds");
     }
 }
