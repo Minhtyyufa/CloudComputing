@@ -16,7 +16,7 @@ There are four classes to implement TPC: main, controller, participant, and mess
 Our Algorithm is Worst-Case O(N) where N is the number of commands. In the worst-case, all of the commands would be sent to the same participant
 
 ## Test Cases
-Provided are three different test cases: Easy Abort, Easy Success, and Hard.
+Provided are three different test cases (found in the [test](./test) directory): Easy Abort, Easy Success, and Hard.
 Easy Abort contains 10 commands that will result in an illegal state triggering an abort. Easy Success contains 10 commands that
 will result in a legal state allowing for a commit. Both of the Easy test cases have 3 participants, but only use 2 in the commands.
 The Hard Test case contains 10,000 commands and 26 participants and will result in an abort operation. Their respective times
@@ -35,11 +35,13 @@ because of the parallelization.
 - [Logback](http://logback.qos.ch/)
 
 ## To Run it
-After installing Logback run these commands:
 ```$xslt
-javac -d test src/com/company/*
-cd test
-java com.company.Main
+git clone https://github.com/Minhtyyufa/CloudComputing.git
+cd CloudComputing
+./build.sh
+cd two_phase_commit
+mvn exec:java -Dexec.mainClass="main.java.com.company.Main"
 ```
+
 ## Resources
 - This helped a lot with logback and threads https://mkyong.com/logging/logback-different-log-file-for-each-thread/

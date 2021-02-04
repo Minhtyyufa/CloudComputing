@@ -52,7 +52,7 @@
         </layout>
     </appender>
 
-    <logger name="com.company" level="debug"
+    <logger name="main.java.com.company" level="debug"
             additivity="false">
         <appender-ref ref="FILE-THREAD" />
         <appender-ref ref="STDOUT" />
