@@ -1,6 +1,10 @@
 package main.java.com.company;
-
+import java.util.Hashtable;
+import java.util.concurrent.BlockingQueue;
 public class Message {
+    // trying to create hashtable
+    Hashtable<String, BlockingQueue> commands = new Hashtable<String, BlockingQueue>();
+
     // Message from controller to participants
     private String command;
 
@@ -29,14 +33,14 @@ public class Message {
 
             }
         }
-
         commandEmpty = true;
         notifyAll();
         if(isAborted) {
             return id + " ABORT";
         }
         else
-            return command;
+            return hashtable(id).get();
+            //return command;
     }
 
     public synchronized void putCommand(String command){
@@ -48,7 +52,8 @@ public class Message {
 
         commandEmpty = false;
 
-        this.command = command;
+        commands.put(command);
+        //this.command = command;
         notifyAll();
     }
 
