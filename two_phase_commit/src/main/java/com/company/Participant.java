@@ -67,7 +67,7 @@ public class Participant implements Runnable {
                 handleCommand(command);
             }
         }
-
+        System.out.println("finished commands");
         firstCommand = true;
         logger.info(this.id + " DONE");
         //For Demonstration Purposes

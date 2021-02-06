@@ -22,11 +22,21 @@ will result in a legal state allowing for a commit. Both of the Easy test cases 
 The Hard Test case contains 10,000 commands and 26 participants and will result in an abort operation. Their respective times
 are shown below:
 
+1st Revision Times
+
 |   Test Case  | Time (milliseconds) |
 |:------------:|:-------------------:|
 |  Easy Abort  |         203         |
 | Easy Success |         184         |
 |     Hard     |         5370        |
+
+2nd Revision Times
+
+|   Test Case  | Time (milliseconds) |
+|:------------:|:-------------------:|
+|  Easy Abort  |         156         |
+| Easy Success |           88       |
+|     Hard     |         1260        |
 
 From these times, we can see that the algorithm our algorithm is O(N). The Hard test case is performing significantly better than 1000x worse than the Easy cases
 because of the parallelization. 
@@ -43,5 +53,14 @@ cd two_phase_commit
 mvn exec:java -Dexec.mainClass="main.java.com.company.Main"
 ```
 
+## What's new in Revision 2?
+
+- Added toolings and made it easier to copy
+- Made improvements to the algorithm as seen in the [Test Cases](#test-cases) section
+    - Added a separate message queue for each participant so that they don't block each other and can perform their actions faster.
+    - This signifantly reduces the amount of dead time that each participant goes through per transaction.
+
+
 ## Resources
 - This helped a lot with logback and threads https://mkyong.com/logging/logback-different-log-file-for-each-thread/
+- Most of the tools have come from https://github.com/robmarano. Thanks Professor!

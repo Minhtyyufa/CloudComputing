@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Controller implements Runnable {
     private final Message message;
-    private final static String COMMAND_PATH = "./easy_abort_commands.txt";
+    private final static String COMMAND_PATH = "./hard_commands.txt";
     public Controller(Message message){
         this.message = message;
     }
@@ -46,12 +46,10 @@ public class Controller implements Runnable {
         Collections.addAll(idSet, ids);
 
         message.sendAbort();
-        System.out.println("idSet: " + idSet);
         while(!idSet.equals(receivedIdSet)){
             String response = message.getResponse();
             String[] responseWords = response.split(" ");
-            System.out.println(response);
-            if(responseWords.length >= 2 && responseWords[1].equals("ACKABORT") && !receivedIdSet.contains(responseWords[0])){
+            if(responseWords.length <= 2 && responseWords[1].equals("ACKABORT") && !receivedIdSet.contains(responseWords[0])){
                 receivedIdSet.add(responseWords[0]);
             }
         }
@@ -70,7 +68,6 @@ public class Controller implements Runnable {
         while(!idSet.equals(receivedIdSet)){
             String response = message.getResponse();
             String[] responseWords = response.split(" ");
-            System.out.println(response);
             if(responseWords.length >= 2 && responseWords[1].equals(neededResponse)){
                 receivedIdSet.add(responseWords[0]);
             } else if (responseWords.length >= 2 && responseWords[1].equals("NO")){
