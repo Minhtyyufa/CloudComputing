@@ -1,4 +1,4 @@
-#ECE 465 Cloud Computing
+# ECE 465 Cloud Computing
 
 ## Description 
 This project is an implementation of the Two-phase commit protocol. There are three different test cases to test the performance of the algorithm. 
