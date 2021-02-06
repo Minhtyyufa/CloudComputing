@@ -1,4 +1,4 @@
-package com.company;
+package main.java.com.company;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    private static String PARTICIPANT_INFO_PATH = "./easy_controller_participant_info.txt";
+    private static String PARTICIPANT_INFO_PATH = "./hard_controller_participant_info.txt";
 
     private static List<String> loadControllerParticipantInfo(){
         try {
@@ -23,16 +23,14 @@ public class Main {
         return null;
     }
     public static void main(String[] args) throws IOException {
-
-
-        Message message = new Message();
-        (new Thread(new Controller(message))).start();
         List<String> participants = loadControllerParticipantInfo();
+        Message message = new Message(participants);
+        (new Thread(new Controller(message))).start();
+
         for(String participant : participants)
         {
             (new Thread(new Participant(Long.parseLong(participant.split(" ")[1]), participant.split(" ")[0], message))).start();
         }
-
 
     }
 }

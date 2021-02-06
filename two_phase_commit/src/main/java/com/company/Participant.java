@@ -1,4 +1,4 @@
-package com.company;
+package main.java.com.company;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.FileHandler;
-import java.util.logging.SimpleFormatter;
 
 public class Participant implements Runnable {
     private AtomicLong balance;
@@ -68,7 +67,7 @@ public class Participant implements Runnable {
                 handleCommand(command);
             }
         }
-
+        System.out.println("finished commands");
         firstCommand = true;
         logger.info(this.id + " DONE");
         //For Demonstration Purposes

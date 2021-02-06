@@ -1,4 +1,10 @@
-package com.company;
+package main.java.com.company;
+
+import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class Message {
     // Message from controller to participants
@@ -16,40 +22,34 @@ public class Message {
     // Indicates the transaction is aborted and participants should revert changes
     private boolean isAborted = false;
 
+    private Hashtable<String, BlockingQueue<String>> messageQueues = new Hashtable<>();
 
-    public synchronized String getCommand(String id){
-        // Returns command to participant when it corresponds to their user
-        while(commandEmpty || !command.split(" ")[0].equals(id)){
-            try {
-                wait();
-                if(isAborted)
-                    break;
-            }
-            catch (InterruptedException e) {
-
-            }
+    public Message(List<String> ids){
+        for(String id: ids){
+            messageQueues.put(id.split(" ")[0], new LinkedBlockingQueue<String>());
         }
+    }
 
-        commandEmpty = true;
-        notifyAll();
+    public String getCommand(String id){
+        String rec_command = null;
+        // Returns command to participant when it corresponds to their user
+        try{
+            while(rec_command == null && !isAborted)
+                rec_command = messageQueues.get(id).poll(5, TimeUnit.MILLISECONDS);
+
+        } catch (InterruptedException e) {
+        }
         if(isAborted) {
             return id + " ABORT";
         }
         else
-            return command;
+            return rec_command;
     }
 
     public synchronized void putCommand(String command){
-        while(!commandEmpty){
-            try {
-                wait();
-            } catch (InterruptedException e) {}
-        }
-
-        commandEmpty = false;
-
-        this.command = command;
-        notifyAll();
+        try{
+            messageQueues.get(command.split(" ")[0]).put(command);
+        } catch (InterruptedException e) {}
     }
 
     public synchronized String getResponse(){
@@ -58,7 +58,6 @@ public class Message {
                 wait();
             }
             catch (InterruptedException e) {
-
             }
         }
         responseEmpty = true;
@@ -73,7 +72,6 @@ public class Message {
                 wait();
             } catch (InterruptedException e) {}
         }
-
 
         responseEmpty = false;
         this.response = response;
