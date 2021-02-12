@@ -1,0 +1,9 @@
+To clean and install:
+    mvn clean install
+
+To build project
+    mvn package
+
+To run
+    mvn exec:java -Dexec.mainClass="main.java.com.company.Main"
+
