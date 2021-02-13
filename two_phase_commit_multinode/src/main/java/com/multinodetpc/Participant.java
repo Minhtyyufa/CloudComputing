@@ -20,7 +20,6 @@ public class Participant implements Runnable {
     private final String id;
     private final MultiNodeMessage message;
     private static Logger logger = LoggerFactory.getLogger(Participant.class);
-    private FileHandler fh;
     private String transactionID;
 
 
@@ -47,7 +46,6 @@ public class Participant implements Runnable {
             newBalance = balance;
             transactionID = command.split(" ")[3];
             firstCommand = false;
-            logger.info("Got past lock");
         }
         if(command.split(" ")[1].equals("sub")){
             newBalance.addAndGet(-Long.parseLong(command.split(" ")[2]));
@@ -63,6 +61,15 @@ public class Participant implements Runnable {
         for(String command = message.readMessage(); !command.split(" ")[1].equals("DONE"); command = message.readMessage())
         {
             logger.info(command);
+
+            // abort other incoming transactions if currently in one transaction
+            if(!firstCommand && !command.split(" ")[3].equals(this.transactionID)){
+                logger.info(command.split(" ")[3] + " " + id + " NO");
+                message.sendMessage(command.split(" ")[3] + " " + id + " NO");
+                message.sendMessage(command.split(" ")[3] + " " + id + " ACKABORT");
+            }
+
+
             if(command.split(" ")[1].equals("ABORT")){
                 //revert changes
                 if(!firstCommand)
@@ -90,8 +97,15 @@ public class Participant implements Runnable {
             sendToController(this.id + " YES");
         }
 
+        String comMsg = message.readMessage();
+        //Accept messages for COMMIT or ABORT for this transaction. Declines other transactions at this time
+        while(!comMsg.split(" ")[2].equals(transactionID)){
+            message.sendMessage(comMsg.split(" ")[2] + " " + id + " NO");
+            comMsg = message.readMessage();
+        }
 
-        if(message.readMessage().split(" ")[1].equals("COMMIT")) {
+
+        if(comMsg.split(" ")[1].equals("COMMIT")) {
             balance = newBalance;
             accountLock.writeLock().unlock();
             logger.info(this.id + " ACK");

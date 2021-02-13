@@ -12,12 +12,16 @@ import java.util.concurrent.TimeUnit;
 public class MultiNodeMessage {
     private DataInputStream dis;
     private DataOutputStream dos;
+
+    //Change these to configure server settings
     private final int serverPort = 8080;
+    private final String IP_ADDRESS = "localhost";
+
     private BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
 
 
     public MultiNodeMessage(String id) throws IOException {
-        InetAddress ip = InetAddress.getByName("localhost");
+        InetAddress ip = InetAddress.getByName(IP_ADDRESS);
         Socket s = new Socket(ip, serverPort);
         dis = new DataInputStream(s.getInputStream());
         dos = new DataOutputStream(s.getOutputStream());
