@@ -10,8 +10,9 @@ import java.util.List;
 
 public class Controller implements Runnable {
     private final MultiNodeMessage message;
-    private final static String COMMAND_PATH = "./hard_commands.txt";
+    private final static String COMMAND_PATH = "./easy_abort_commands.txt";
     private final String controllerID;
+    private HashSet<String> abortedIds = new HashSet<>();
 
     public Controller(String transactionID) throws IOException {
         this.controllerID = "CONTROLLER" + transactionID;
@@ -43,19 +44,21 @@ public class Controller implements Runnable {
     }
 
     private void abortTransaction(String[] ids){
-        HashSet<String> receivedIdSet = new HashSet<String>();
+
         HashSet<String> idSet = new HashSet<String>();
         Collections.addAll(idSet, ids);
         for(String id : ids){
             sendToParticipant(id + " ABORT");
         }
 
-        while(!idSet.equals(receivedIdSet)){
+        while(!idSet.equals(abortedIds)){
             String response = readFromParticipant();
             String[] responseWords = response.split(" ");
-            if(responseWords.length <= 2 && responseWords[1].equals("ACKABORT") && !receivedIdSet.contains(responseWords[0])){
-                receivedIdSet.add(responseWords[0]);
+            /*
+            if(responseWords.length <= 2 && responseWords[1].equals("ACKABORT") && !abortedIds.contains(responseWords[0])){
+                abortedIds.add(responseWords[0]);
             }
+             */
         }
         System.out.println("Transaction Aborted");
 
@@ -85,7 +88,11 @@ public class Controller implements Runnable {
     }
 
     private String readFromParticipant(){
-        return this.message.readMessage().split(" ", 2)[1];
+        String msg = this.message.readMessage().split(" ", 2)[1];
+        if(msg.split(" ")[1].equals("ACKABORT")){
+            abortedIds.add(msg.split(" ")[0]);
+        }
+        return msg;
     }
 
     public void run(){

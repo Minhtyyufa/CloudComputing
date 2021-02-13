@@ -22,6 +22,8 @@ will result in a legal state allowing for a commit. Both of the Easy test cases 
 The Hard Test case contains 10,000 commands and 26 participants and will result in an abort operation. Their respective times
 are shown below:
 
+
+Single Node:
 1st Revision Times
 
 |   Test Case  | Time (milliseconds) |
@@ -38,6 +40,13 @@ are shown below:
 | Easy Success |           88       |
 |     Hard     |         1260        |
 
+MultiNode: 
+|   Test Case  | Time (milliseconds) |
+|:------------:|:-------------------:|
+|  Easy Abort  |         24         |
+| Easy Success |         16         |
+|     Hard     |         2476        |
+
 From these times, we can see that the algorithm our algorithm is O(N). The Hard test case is performing significantly better than 1000x worse than the Easy cases
 because of the parallelization. 
 
@@ -48,9 +57,19 @@ because of the parallelization.
 ```$xslt
 git clone https://github.com/Minhtyyufa/CloudComputing.git
 cd CloudComputing
+
+# To run the messaging server:
 ./build.sh
 cd two_phase_commit
-mvn exec:java -Dexec.mainClass="main.java.com.company.Main"
+mvn exec:java -Dexec.mainClass="main.java.com.multinodetpc.Server"
+
+# To run the protocol:
+./build.sh
+cd two_phase_commit
+mvn exec:java -Dexec.mainClass="main.java.com.multinodetpc.Main"
+
+# NOTE: if you wish to host the server on a different machine 
+make sure to configure the server settings in MultiNodeMessage.java
 ```
 
 ## What's new in Revision 2?
@@ -61,11 +80,11 @@ mvn exec:java -Dexec.mainClass="main.java.com.company.Main"
     - This signifantly reduces the amount of dead time that each participant goes through per transaction.
 
 
-## What's new in Revision 3?
+## What's new in Multi-Node?
 
-- Implemented a server and client handler in order to convert the algorithm to an-node threaded algorithm
+- Implemented a server and client handler in order to apply the algorithm to multiple machines
 - Added server code that will transfer messages to different nodes
-- The participants now send messages through a socket 
+- The participants and controller now send messages through a socket 
 
 
 ## Resources
