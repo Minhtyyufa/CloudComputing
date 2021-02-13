@@ -80,6 +80,13 @@ make sure to configure the server settings in MultiNodeMessage.java
     - This signifantly reduces the amount of dead time that each participant goes through per transaction.
 
 
+## What's new in Revision 3?
+
+- Implemented a server and client handler in order to convert the algorithm to an-node threaded algorithm
+- Added server code that will transfer messages to different nodes
+- The participants now send messages through a socket 
+
+
 ## Resources
 - This helped a lot with logback and threads https://mkyong.com/logging/logback-different-log-file-for-each-thread/
 - Most of the tools have come from https://github.com/robmarano. Thanks Professor!
