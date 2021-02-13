@@ -80,11 +80,11 @@ make sure to configure the server settings in MultiNodeMessage.java
     - This signifantly reduces the amount of dead time that each participant goes through per transaction.
 
 
-## What's new in Revision 3?
+## What's new in Multi-Node?
 
-- Implemented a server and client handler in order to convert the algorithm to an-node threaded algorithm
+- Implemented a server and client handler in order to apply the algorithm to multiple machines
 - Added server code that will transfer messages to different nodes
-- The participants now send messages through a socket 
+- The participants and controller now send messages through a socket 
 
 
 ## Resources
