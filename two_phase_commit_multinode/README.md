@@ -72,20 +72,10 @@ mvn exec:java -Dexec.mainClass="main.java.com.multinodetpc.Main"
 make sure to configure the server settings in MultiNodeMessage.java
 ```
 
-## What's new in Revision 2?
+## What's new in Multi-Node Revision 2?
 
-- Added toolings and made it easier to copy
-- Made improvements to the algorithm as seen in the [Test Cases](#test-cases) section
-    - Added a separate message queue for each participant so that they don't block each other and can perform their actions faster.
-    - This signifantly reduces the amount of dead time that each participant goes through per transaction.
-
-
-## What's new in Multi-Node?
-
-- Implemented a server and client handler in order to apply the algorithm to multiple machines
-- Added server code that will transfer messages to different nodes
-- The participants and controller now send messages through a socket 
-
+- Improved the algorithm to handle multiple transactions by having separate transaction threads in each participant node
+- Easier to run and configure settings
 
 ## Resources
 - This helped a lot with logback and threads https://mkyong.com/logging/logback-different-log-file-for-each-thread/

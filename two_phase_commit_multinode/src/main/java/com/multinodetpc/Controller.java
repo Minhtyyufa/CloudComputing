@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Controller implements Runnable {
     private final MultiNodeMessage message;
-    private final static String COMMAND_PATH = "./easy_success_commands.txt";
+    private final static String COMMAND_PATH = "./hard_commands.txt";
     private final String controllerID;
     private HashSet<String> abortedIds = new HashSet<>();
 
