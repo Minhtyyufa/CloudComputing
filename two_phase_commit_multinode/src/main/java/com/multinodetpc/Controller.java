@@ -1,5 +1,11 @@
 package main.java.com.multinodetpc;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,7 +16,7 @@ import java.util.List;
 
 public class Controller implements Runnable {
     private final MultiNodeMessage message;
-    private final static String COMMAND_PATH = "./easy_abort_commands.txt";
+    private final static String COMMAND_PATH = config_file.json;
     private final String controllerID;
     private HashSet<String> abortedIds = new HashSet<>();
 
@@ -28,14 +34,35 @@ public class Controller implements Runnable {
         return ids.toArray(new String[0]);
     }
 
+    private static void parseCommandObject(JSONObject transaction) {
+        //Get transaction object within list
+        JSONObject transactionObject = (JSONObject) transaction.get("transaction");
+
+        //Get Command
+        String command = (String) transactionObject.get("command");
+
+    }
+
     // Reads the commands from a file
     private List<String> readCommands(){
-        try {
-            BufferedReader fileReader = new BufferedReader(new FileReader(COMMAND_PATH));
+        JSONParser jsonParser = new JSONParser();
+        try (FileReader reader = new FileReader(config_path.json)) {
+            //Read JSON files
+            Object obj = jsonParser.parse(reader);
+            JSONObject jsonObject = (JSONObject)obj;
+            JSONObjet transactionObject = (JSONObject) jsonObject.get("transaction")
+            Iterator iterator = transactionObjet.iterator();
             List<String> commands = new ArrayList<>();
-            for(String line = fileReader.readLine(); line != null; line = fileReader.readLine()){
+
+            while (iterator.hasNext()) {
+                String command = (String) transactionObject.get("command");
                 commands.add(line);
             }
+//            BufferedReader fileReader = new BufferedReader(new FileReader(COMMAND_PATH));
+//            List<String> commands = new ArrayList<>();
+//            for(String line = fileReader.readLine(); line != null; line = fileReader.readLine()){
+//                commands.add(line);
+//            }
             return commands;
         } catch (IOException e){
             e.printStackTrace();
@@ -106,7 +133,20 @@ public class Controller implements Runnable {
         // Send each of the commands to the participants
         for (String command : commands) {
             sendToParticipant(command);
+//            sendToParticipant(id + "ALIVE_CONTROLLER");
         }
+//        try {
+//            while(receiveFromEachParticipant(ids, "ALIVE")) {
+//                wait(TimeInterval);
+//                System.out.println("Controller: " + "I'm alive");
+//                sendToParticipant(id + "ALIVE_CONTROLLER");
+//                // Let the thread sleep for a while.
+//                Thread.sleep(TimeInterval * 1000);
+//            }
+//        } catch (InterruptedException e) {
+//            System.out.println("Controller interrupted.");
+//        }
+
         // Wait for votes from participants
         if(!receiveFromEachParticipant(ids, "YES")){
             // If one voted no, abort the transaction entirely

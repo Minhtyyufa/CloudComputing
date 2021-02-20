@@ -51,6 +51,7 @@ public class MultiNodeMessage {
         }
     }
 
+
     public String readMessage(){
         try {
             String recMessage = null;

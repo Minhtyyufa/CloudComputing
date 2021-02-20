@@ -1,0 +1,8 @@
+[
+	{
+		"transaction": {
+			"id" : "a",
+			"command" : "a add 10"
+		}
+	}
+]

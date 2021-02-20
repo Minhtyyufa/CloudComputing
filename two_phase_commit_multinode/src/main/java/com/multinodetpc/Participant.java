@@ -13,6 +13,14 @@ import java.util.logging.FileHandler;
 
 public class Participant implements Runnable {
 
+    //idk man just trying shit out
+    //https://stackoverflow.com/questions/33869092/java-heartbeat-design
+    //https://docs.oracle.com/cd/E19206-01/816-4178/6madjde6e/index.html
+
+    private int TimeInterval = 5; //seconds
+    private String HeartBeat = "HeartbeatAgent";
+    private HashMap<Integer, Object> values; // <id, value>
+
     private AtomicLong balance;
     private AtomicLong newBalance;
     private final ReadWriteLock accountLock = new ReentrantReadWriteLock();
@@ -39,7 +47,11 @@ public class Participant implements Runnable {
     private void sendToController(String message){
         this.message.sendMessage(this.transactionID +" " + message);
     }
-
+//    public void connectionEstablished (String message) {}
+//    public void connectionRetrying () {}
+//    public void connectionReestablished () {}
+//    public void connectionLost () {}
+//    public void connectionEliminated () {}
     private void handleCommand(String command){
         if(firstCommand){
             accountLock.writeLock().lock();
@@ -58,6 +70,22 @@ public class Participant implements Runnable {
     @Override
     public void run(){
         MDC.put("logFileName", id);
+
+        System.out.println("Running " +  this.id );
+//        try {
+//            while(command.split(" ")[1].equals("ALIVE_CONTROLLER")) {
+//                wait(TimeInterval);
+//                System.out.println("Thread: " + this.id + ", " + "I'm alive");
+//                sendToController(this.id + " ALIVE")
+//                // Let the thread sleep for a while.
+//                Thread.sleep(TimeInterval * 1000);
+//            }
+//        } catch (InterruptedException e) {
+//            System.out.println("Thread " +  this.id + " interrupted.");
+//        }
+        //System.out.println("Thread " +  this.id + " exiting.");
+
+
         for(String command = message.readMessage(); !command.split(" ")[1].equals("DONE"); command = message.readMessage())
         {
             logger.info(command);

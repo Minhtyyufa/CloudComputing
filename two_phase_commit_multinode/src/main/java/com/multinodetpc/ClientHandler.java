@@ -12,6 +12,8 @@ public class ClientHandler implements Runnable{
     final DataOutputStream dos;
     Socket s;
 
+
+
     public ClientHandler(Socket s, String id, DataInputStream dis, DataOutputStream dos){
         this.s = s;
         this.id = id;
