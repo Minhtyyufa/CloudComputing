@@ -34,7 +34,7 @@ public class Main {
         synchronized(m){
             m.wait(1000);
             controllerThread1.start();
-            //controllerThread2.start();
+            controllerThread2.start();
         }
 
     }

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Controller implements Runnable {
     private final MultiNodeMessage message;
-    private final static String COMMAND_PATH = "./easy_abort_commands.txt";
+    private final static String COMMAND_PATH = "./easy_success_commands.txt";
     private final String controllerID;
     private HashSet<String> abortedIds = new HashSet<>();
 
@@ -51,16 +51,17 @@ public class Controller implements Runnable {
             sendToParticipant(id + " ABORT");
         }
 
-        while(!idSet.equals(abortedIds)){
+        while(!idSet.equals(this.abortedIds)){
             String response = readFromParticipant();
             String[] responseWords = response.split(" ");
+            System.out.println(this.controllerID + ": " + this.abortedIds);
             /*
             if(responseWords.length <= 2 && responseWords[1].equals("ACKABORT") && !abortedIds.contains(responseWords[0])){
                 abortedIds.add(responseWords[0]);
             }
              */
         }
-        System.out.println("Transaction Aborted");
+        System.out.println(this.controllerID +  ": Transaction Aborted");
 
     }
 
@@ -90,7 +91,7 @@ public class Controller implements Runnable {
     private String readFromParticipant(){
         String msg = this.message.readMessage().split(" ", 2)[1];
         if(msg.split(" ")[1].equals("ACKABORT")){
-            abortedIds.add(msg.split(" ")[0]);
+            this.abortedIds.add(msg.split(" ")[0]);
         }
         return msg;
     }
@@ -112,7 +113,7 @@ public class Controller implements Runnable {
             // If one voted no, abort the transaction entirely
             abortTransaction(ids);
             long endTime = System.nanoTime();
-            System.out.println("Time to complete: " + (endTime - startTime)/1000000 + " milliseconds");
+            System.out.println(this.controllerID + " time to complete: " + (endTime - startTime)/1000000 + " milliseconds");
             return;
         }
 
@@ -125,7 +126,7 @@ public class Controller implements Runnable {
         receiveFromEachParticipant(ids, "ACK");
 
         long endTime = System.nanoTime();
-        System.out.println("Time to complete: " + (endTime - startTime)/1000000 + " milliseconds");
+        System.out.println(this.controllerID + " time to complete: " + (endTime - startTime)/1000000 + " milliseconds");
     }
 
 }
