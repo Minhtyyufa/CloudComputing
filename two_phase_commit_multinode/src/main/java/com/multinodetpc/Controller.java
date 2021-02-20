@@ -4,6 +4,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.BufferedReader;
@@ -18,6 +20,7 @@ public class Controller implements Runnable {
     private final MultiNodeMessage message;
     private final static String COMMAND_PATH = config_file.json;
     private final String controllerID;
+    private final String transactionID;
     private HashSet<String> abortedIds = new HashSet<>();
 
     public Controller(String transactionID) throws IOException {
@@ -34,35 +37,49 @@ public class Controller implements Runnable {
         return ids.toArray(new String[0]);
     }
 
-    private static void parseCommandObject(JSONObject transaction) {
-        //Get transaction object within list
-        JSONObject transactionObject = (JSONObject) transaction.get("transaction");
-
-        //Get Command
-        String command = (String) transactionObject.get("command");
-
+    public List<String> getValuesForGivenKey(String jsonArrayStr, String key) {
+        JSONArray jsonArray = new JSONArray(jsonArrayStr);
+        return IntStream.range(0, jsonArray.length())
+                .mapToObj(index -> ((JSONObject)jsonArray.get(index)).optString(key))
+                .collect(Collectors.toList());
     }
 
-    // Reads the commands from a file
-    private List<String> readCommands(){
+    //get command from key
+    private String getCommand(String transactionID) {
         JSONParser jsonParser = new JSONParser();
-        try () {
+        try (FileReader reader = new FILEREADER("config_file.json")) {
             //Read JSON files
-            JSONArray transactionsArray = (JSONArray) jsonParser.parse(new FileReader(config_path.json));
-            List<String> commands = new ArrayList<>();
+            Object obj = jsonParser.parse(reader);
 
-            for (Object transactionObject: transactionsArray) {
-                JSONObject transaction = (JSONObject) transactionObject;
-                String command = (String) transaction.get("command");
-                commands.add(command);
-            }
+            //Json file format:
+            // ["transactionID: {"command": "a add 10"}]
+            String command = obj.getJSONObject(transactionID).getString("command");
+            return command;
 
-            return commands;
         } catch (IOException e){
             e.printStackTrace();
         }
-        return null;
     }
+//    // Reads the commands from a file
+//    private List<String> readCommands(){
+//        JSONParser jsonParser = new JSONParser();
+//        try () {
+//            //Read JSON files
+//            JSONArray transactionsArray = (JSONArray) jsonParser.parse(new FileReader(config_path.json));
+//            List<String> commands = new ArrayList<>();
+//
+//            for (Object transactionObject: transactionsArray) {
+//                JSONObject transaction = (JSONObject) transactionObject;
+//                String command = (String) transaction.get("command");
+//                commands.add(command);
+//            }
+//
+//            return commands;
+//        } catch (IOException e){
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     private void abortTransaction(String[] ids){
 

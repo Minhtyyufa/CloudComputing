@@ -16,6 +16,7 @@ public class Server {
         ServerSocket ss = new ServerSocket(8080);
         Socket s;
         //https://stackoverflow.com/questions/30365250/what-will-happen-if-i-use-socket-setkeepalive-in-node-js-server
+        //not the best method though
         s.setKeepAlive(true, 6000);
         // Accepts new clients
         while(true) {
