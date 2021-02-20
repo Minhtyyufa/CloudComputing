@@ -10,11 +10,17 @@ import java.util.List;
 
 public class Controller implements Runnable {
     private final MultiNodeMessage message;
-    private final static String COMMAND_PATH = "./hard_commands.txt";
+    private static String COMMAND_PATH;
     private final String controllerID;
     private HashSet<String> abortedIds = new HashSet<>();
 
     public Controller(String transactionID) throws IOException {
+        try {
+            JSONReader jsonReader = new JSONReader();
+            COMMAND_PATH = jsonReader.getAttribute("command_path");
+        } catch (Exception e){
+            COMMAND_PATH = "easy_success_commands.txt";
+        }
         this.controllerID = "CONTROLLER" + transactionID;
         this.message = new MultiNodeMessage(this.controllerID);
     }
@@ -54,7 +60,6 @@ public class Controller implements Runnable {
         while(!idSet.equals(this.abortedIds)){
             String response = readFromParticipant();
             String[] responseWords = response.split(" ");
-            System.out.println(this.controllerID + ": " + this.abortedIds);
             /*
             if(responseWords.length <= 2 && responseWords[1].equals("ACKABORT") && !abortedIds.contains(responseWords[0])){
                 abortedIds.add(responseWords[0]);

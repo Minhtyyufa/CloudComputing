@@ -10,7 +10,13 @@ public class Main {
 
     private static List<String> loadControllerParticipantInfo(){
         try {
-            String PARTICIPANT_INFO_PATH = "./hard_controller_participant_info.txt";
+            String PARTICIPANT_INFO_PATH;
+            try {
+                JSONReader jsonReader = new JSONReader();
+                PARTICIPANT_INFO_PATH = jsonReader.getAttribute("participant_info");
+            } catch (Exception e){
+                PARTICIPANT_INFO_PATH = "easy_controller_participant_info.txt";
+            }
             BufferedReader fileReader = new BufferedReader(new FileReader(PARTICIPANT_INFO_PATH));
             List<String> participants = new ArrayList<>();
             for(String line = fileReader.readLine(); line != null; line = fileReader.readLine()){

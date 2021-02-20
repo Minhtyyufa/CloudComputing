@@ -41,11 +41,21 @@ Single Node:
 |     Hard     |         1260        |
 
 MultiNode: 
+1st Revision Times
+
 |   Test Case  | Time (milliseconds) |
 |:------------:|:-------------------:|
 |  Easy Abort  |         24         |
 | Easy Success |         16         |
 |     Hard     |         2476        |
+
+2nd Revision Times
+
+|   Test Case  | Time (milliseconds) |
+|:------------:|:-------------------:|
+|  Easy Abort  |         28         |
+| Easy Success |         13         |
+|     Hard     |         679        |
 
 From these times, we can see that the algorithm our algorithm is O(N). The Hard test case is performing significantly better than 1000x worse than the Easy cases
 because of the parallelization. 
@@ -69,13 +79,19 @@ cd two_phase_commit
 mvn exec:java -Dexec.mainClass="main.java.com.multinodetpc.Main"
 
 # NOTE: if you wish to host the server on a different machine 
-make sure to configure the server settings in MultiNodeMessage.java
+make sure to configure the server settings in the config.json file
 ```
 
 ## What's new in Multi-Node Revision 2?
 
 - Improved the algorithm to handle multiple transactions by having separate transaction threads in each participant node
 - Easier to run and configure settings
+
+Future Work:
+
+- Ensure each command is individually processed to check for corruption and loss
+- Implement heartbeats
+
 
 ## Resources
 - This helped a lot with logback and threads https://mkyong.com/logging/logback-different-log-file-for-each-thread/

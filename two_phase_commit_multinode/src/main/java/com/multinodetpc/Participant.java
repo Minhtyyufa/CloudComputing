@@ -51,10 +51,6 @@ public class Participant implements Runnable {
             while(transactionID == null){
                 transactionMessage = this.message.readMessage();
                 transactionID = "CONTROLLER" + transactionMessage.split("CONTROLLER")[1].split(" ")[0];
-                if(!transactionID.equals("CONTROLLER1") && !transactionID.equals("CONTROLLER2")){
-                    System.out.println("Failed Message: "  + transactionMessage);
-                    transactionID = null;
-                }
             }
 
             if(!transactionMessages.containsKey(transactionID)){
@@ -76,8 +72,9 @@ public class Participant implements Runnable {
         public TransactionHandler(String transactionID){
             this.transactionID = transactionID;
         }
+
         private void sendToController(String toControllerMessage){
-            //logger.info(this.transactionID +" " + toControllerMessage);
+            logger.info(this.transactionID +" " + toControllerMessage);
             message.sendMessage(this.transactionID +" " + toControllerMessage);
         }
         private String readMessage()  {
@@ -114,10 +111,9 @@ public class Participant implements Runnable {
 
         @Override
         public void run(){
-            System.out.println(this.transactionID);
             for(String command = readMessage(); !command.split(" ")[1].equals("DONE"); command = readMessage())
             {
-                //logger.info(command);
+                logger.info(command);
                 String[] commandWords = command.split(" ");
 
 
@@ -133,8 +129,9 @@ public class Participant implements Runnable {
                     return;
                 } else {
                     if(!handleCommand(command)){
-                        //logger.info(commandWords[3] + " " + id + " NO");
                         logger.info(this.transactionID +" " + id + " triggered Lock Abort");
+                        logger.info(this.transactionID + " " + id + " NO");
+                        logger.info(this.transactionID + " " + id + " ACKABORT");
                         message.sendMessage(this.transactionID + " " + id + " NO");
                         message.sendMessage(this.transactionID + " " + id + " ACKABORT");
                         return;
@@ -143,7 +140,7 @@ public class Participant implements Runnable {
             }
             System.out.println("finished commands");
             this.firstCommand = true;
-            //logger.info(this.transactionID + " DONE");
+            logger.info(this.transactionID + " " + id+ " DONE");
             //For Demonstration Purposes
             System.out.println("Process " + id + " has finished");
 
@@ -165,12 +162,10 @@ public class Participant implements Runnable {
             if(comMsg.split(" ")[1].equals("COMMIT")) {
                 balance = newBalance;
                 accountLock.writeLock().unlock();
-                //logger.info(id + " ACK");
                 sendToController(id + " ACK");
             }
             else {
                 accountLock.writeLock().unlock();
-                //logger.info(id + " ACKABORT");
                 sendToController(id + " ACKABORT");
             }
             transactionMessages.remove(this.transactionID);
