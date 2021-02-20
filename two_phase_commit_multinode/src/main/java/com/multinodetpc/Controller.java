@@ -46,23 +46,17 @@ public class Controller implements Runnable {
     // Reads the commands from a file
     private List<String> readCommands(){
         JSONParser jsonParser = new JSONParser();
-        try (FileReader reader = new FileReader(config_path.json)) {
+        try () {
             //Read JSON files
-            Object obj = jsonParser.parse(reader);
-            JSONObject jsonObject = (JSONObject)obj;
-            JSONObjet transactionObject = (JSONObject) jsonObject.get("transaction")
-            Iterator iterator = transactionObjet.iterator();
+            JSONArray transactionsArray = (JSONArray) jsonParser.parse(new FileReader(config_path.json));
             List<String> commands = new ArrayList<>();
 
-            while (iterator.hasNext()) {
-                String command = (String) transactionObject.get("command");
-                commands.add(line);
+            for (Object transactionObject: transactionsArray) {
+                JSONObject transaction = (JSONObject) transactionObject;
+                String command = (String) transaction.get("command");
+                commands.add(command);
             }
-//            BufferedReader fileReader = new BufferedReader(new FileReader(COMMAND_PATH));
-//            List<String> commands = new ArrayList<>();
-//            for(String line = fileReader.readLine(); line != null; line = fileReader.readLine()){
-//                commands.add(line);
-//            }
+
             return commands;
         } catch (IOException e){
             e.printStackTrace();
