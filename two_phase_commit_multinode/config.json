@@ -1,0 +1,5 @@
+{
+  "command_path": "easy_success_commands.txt",
+  "participant_info": "easy_controller_participant_info.txt",
+  "server_ip": "localhost"
+}

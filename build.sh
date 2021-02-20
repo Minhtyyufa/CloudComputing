@@ -1,6 +1,6 @@
 #!/bin/bash
 
-APPS="two_phase_commit"
+APPS="two_phase_commit two_phase_commit_multinode"
 
 # First ensure dependencies loaded since .m2 may be empty
 mvn dependency:tree

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -17,7 +18,7 @@ public class Participant implements Runnable {
     private Boolean firstCommand = true;
     private final String id;
     private final Message message;
-    private static Logger logger = LoggerFactory.getLogger(Participant.class);
+    private static Logger logger = LoggerFactory.getLogger(main.java.com.company.Participant.class);
     private FileHandler fh;
 
     // For logging: https://stackoverflow.com/questions/15758685/how-to-write-logs-in-text-file-when-using-java-util-logging-logger
@@ -35,17 +36,33 @@ public class Participant implements Runnable {
 //        fh.setFormatter(formatter);
     }
 
-    private void handleCommand(String command){
+    private void revertChanges(String messageToSend){
+        if(!firstCommand)
+            accountLock.writeLock().unlock();
+        MDC.remove("logFileName");
+        message.putResponse(this.id + " " + messageToSend);
+        firstCommand= true;
+    }
+
+    private boolean handleCommand(String command) {
         if(firstCommand){
-            newBalance = balance;
-            accountLock.writeLock().lock();
-            firstCommand = false;
+            try {
+                if(!accountLock.writeLock().tryLock(1, TimeUnit.SECONDS)) {
+                    logger.info(this.id + " failed to acquire lock");
+                    return false;
+                }
+                newBalance = balance;
+                firstCommand = false;
+            } catch(Exception e) {
+                return false;
+            }
         }
         if(command.split(" ")[1].equals("sub")){
             newBalance.addAndGet(-Long.parseLong(command.split(" ")[2]));
         } else {
             newBalance.addAndGet(Long.parseLong(command.split(" ")[2]));
         }
+        return true;
     }
 
     // need a two way channel to communicate
@@ -57,11 +74,7 @@ public class Participant implements Runnable {
             logger.info(command);
             if(command.split(" ")[1].equals("ABORT")){
                 //revert changes
-                if(!firstCommand)
-                    accountLock.writeLock().unlock();
-                MDC.remove("logFileName");
-                message.putResponse(this.id + " ACKABORT");
-                firstCommand= true;
+                revertChanges("ACKABORT");
                 return;
             } else {
                 handleCommand(command);
@@ -87,12 +100,11 @@ public class Participant implements Runnable {
             accountLock.writeLock().unlock();
             logger.info(this.id + " ACK");
             message.putResponse(this.id + " ACK");
+            MDC.remove("logFileName");
         }
         else {
-            logger.info(this.id + " ACKABORT");
-            message.putResponse(this.id + " ACKABORT");
+            revertChanges("ACKABORT");
         }
-        MDC.remove("logFileName");
     }
 
 }

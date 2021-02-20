@@ -265,6 +265,7 @@
 			<modules>
 				<module>commons</module>
 				<module>two_phase_commit</module>
+				<module>two_phase_commit_multinode</module>
 			</modules>
 		</profile>
 
